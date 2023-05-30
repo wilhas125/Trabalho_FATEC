@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Estimativa de TCO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .container {
+      margin: 0 auto;
+      max-width: 500px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      margin-bottom: 10px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    .input-group select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-color: #fff;
+      background-image: linear-gradient(45deg, transparent 50%, #888 50%), linear-gradient(135deg, #888 50%, transparent 50%);
+      background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    .input-group select:focus {
+      outline: none;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #aaa;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .result label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .result span {
+      display: inline-block;
+      margin-left: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Estimativa de TCO</h1>
+  <div class="container">
+    <div class="input-group">
+      <label for="orcamento">Valor do orçamento disponível:</label>
+      <input type="text" id="orcamento" placeholder="Informe o valor do orçamento">
+    </div>
+    <div class="input-group">
+      <label for="necessidadeArmazenamento">Necessidade de armazenamento em gigabytes:</label>
+      <input type="text" id="necessidadeArmazenamento" placeholder="Informe a necessidade de armazenamento">
+    </div>
+    <div class="input-group">
+      <label for="periodoContratacao">Período de contratação:</label>
+      <select id="periodoContratacao">
+        <option value="ANUAL">Anual</option>
+        <option value="SEMESTRAL">Semestral</option>
+        <option value="TRIMESTRAL">Trimestral</option>
+      </select>
+    </div>
+    <button onclick="calcularTCO()">Calcular</button>
+    <div class="result">
+      <label>Estimativa de TCO:</label>
+      <div>
+        <label>Azure:</label>
+        <span id="tcoAzure"></span>
+      </div>
+      <div>
+        <label>AWS:</label>
+        <span id="tcoAWS"></span>
+      </div>
+      <div>
+        <label>Google Cloud:</label>
+        <span id="tcoGoogle"></span>
+      </div>
+      <div>
+        <label>Recomendação:</label>
+        <span id="recomendacao"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function calcularTCO() {
+      var orcamento = parseFloat(document.getElementById("orcamento").value);
+      var necessidadeArmazenamento = parseFloat(document.getElementById("necessidadeArmazenamento").value);
+      var periodo = document.getElementById("periodoContratacao").value;
+
+      var tcoAzure = estimarTCOAzure(orcamento, necessidadeArmazenamento, periodo);
+      var tcoAWS = estimarTCOAWS(orcamento, necessidadeArmazenamento, periodo);
+      var tcoGoogle = estimarTCOGoogle(orcamento, necessidadeArmazenamento, periodo);
+
+      document.getElementById("tcoAzure").innerHTML = "$" + tcoAzure.toLocaleString();
+      document.getElementById("tcoAWS").innerHTML = "$" + tcoAWS.toLocaleString();
+      document.getElementById("tcoGoogle").innerHTML = "$" + tcoGoogle.toLocaleString();
+
+      var menorTCO = Math.min(tcoAzure, Math.min(tcoAWS, tcoGoogle));
+
+      var recomendacao = [];
+
+      if (tcoAzure === menorTCO) {
+        recomendacao.push("Azure");
+      }
+      if (tcoAWS === menorTCO) {
+        recomendacao.push("AWS");
+      }
+      if (tcoGoogle === menorTCO) {
+        recomendacao.push("Google Cloud");
+      }
+
+      document.getElementById("recomendacao").innerHTML = recomendacao.join(", ");
+    }
+
+    function estimarTCOAzure(orcamento, necessidadeArmazenamento, periodo) {
+      // Lógica de estimativa de TCO para Azure
+      var armazenamentoAzure = necessidadeArmazenamento * 0.1; // Preço estimado de armazenamento em Azure ($0.1 por GB)
+
+      var custoAnualAzure = armazenamentoAzure * 12; // Custo anual de armazenamento em Azure
+
+      var fatorPeriodo = 1;
+      if (periodo === "SEMESTRAL") {
+        fatorPeriodo = 2;
+      } else if (periodo === "TRIMESTRAL") {
+        fatorPeriodo = 4;
+      }
+
+      var tcoAzure = custoAnualAzure * fatorPeriodo; // Custo total estimado de TCO em Azure
+
+      return tcoAzure;
+    }
+
+    function estimarTCOAWS(orcamento, necessidadeArmazenamento, periodo) {
+      // Lógica de estimativa de TCO para AWS
+      var armazenamentoAWS = necessidadeArmazenamento * 0.15; // Preço estimado de armazenamento em AWS ($0.15 por GB)
+
+      var custoAnualAWS = armazenamentoAWS * 12; // Custo anual de armazenamento em AWS
+
+      var fatorPeriodo = 1;
+      if (periodo === "SEMESTRAL") {
+        fatorPeriodo = 2;
+      } else if (periodo === "TRIMESTRAL") {
+        fatorPeriodo = 4;
+      }
+
+      var tcoAWS = custoAnualAWS * fatorPeriodo; // Custo total estimado de TCO em AWS
+
+      return tcoAWS;
+    }
+
+    function estimarTCOGoogle(orcamento, necessidadeArmazenamento, periodo) {
+      // Lógica de estimativa de TCO para Google Cloud
+      var armazenamentoGoogle = necessidadeArmazenamento * 0.12; // Preço estimado de armazenamento em Google Cloud ($0.12 por GB)
+
+      var custoAnualGoogle = armazenamentoGoogle * 12; // Custo anual de armazenamento em Google Cloud
+
+      var fatorPeriodo = 1;
+      if (periodo === "SEMESTRAL") {
+        fatorPeriodo = 2;
+      } else if (periodo === "TRIMESTRAL") {
+        fatorPeriodo = 4;
+      }
+
+      var tcoGoogle = custoAnualGoogle * fatorPeriodo; // Custo total estimado de TCO em Google Cloud
+
+      return tcoGoogle;
+    }
+  </script>
+</body>
+
+</html>
